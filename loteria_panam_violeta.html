@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lotería Panam</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Arial", sans-serif;
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Purple_gradient_background.svg/1024px-Purple_gradient_background.svg.png');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-top: 40px;
+      font-weight: bold;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(-50px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: white;
+      color: #52057e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      font-weight: bold;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .cell.marked {
+      background-color: #a020f0;
+      color: white;
+      animation: glow 1s infinite alternate;
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px #a020f0; }
+      100% { box-shadow: 0 0 25px #f0a0f0; }
+    }
+
+    #sendButton {
+      margin-top: 30px;
+      padding: 15px 25px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 8px;
+      background-color: #0088cc;
+      color: white;
+      cursor: pointer;
+      display: none;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { box-shadow: 0 0 0px #00aaff; }
+      to { box-shadow: 0 0 15px #00ffff; }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background-size: cover;
+      pointer-events: none;
+      animation: fall 3s linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(800px) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Lotería Panam 🌴</h1>
+  <div class="grid" id="grid"></div>
+  <button id="sendButton">📲 Enviar por WhatsApp</button>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const sendButton = document.getElementById("sendButton");
+    const selected = new Set();
+    const maxNumbers = 9;
+    const winningNumbers = Array.from({length: 9}, () => Math.floor(Math.random() * 20) + 1);
+
+    winningNumbers.forEach((num, i) => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = num;
+      cell.addEventListener("click", () => {
+        if (!cell.classList.contains("marked")) {
+          cell.classList.add("marked");
+          selected.add(num);
+        } else {
+          cell.classList.remove("marked");
+          selected.delete(num);
+        }
+
+        if (selected.size === maxNumbers) {
+          launchConfetti();
+          sendButton.style.display = "inline-block";
+        } else {
+          sendButton.style.display = "none";
+        }
+      });
+      grid.appendChild(cell);
+    });
+
+    sendButton.addEventListener("click", () => {
+      const msg = `¡Estos son mis números de Lotería Panam! 🎉
+
+${[...selected].join(", ")}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+    });
+
+    function launchConfetti() {
+      for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        const icons = ["🌴", "🌺", "🍹", "☀️"];
+        confetti.textContent = icons[Math.floor(Math.random() * icons.length)];
+        confetti.style.left = Math.random() * window.innerWidth + "px";
+        confetti.style.fontSize = (Math.random() * 20 + 16) + "px";
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3000);
+      }
+    }
+  </script>
+</body>
+</html>

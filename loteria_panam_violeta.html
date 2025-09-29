@@ -8,108 +8,94 @@
   <style>
     body {
       margin: 0;
-      font-family: "Arial", sans-serif;
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Purple_gradient_background.svg/1024px-Purple_gradient_background.svg.png');
+      font-family: 'Segoe UI', sans-serif;
+      background-image: url('fondo.png');
       background-size: cover;
       background-position: center;
-      color: white;
       text-align: center;
+      color: white;
     }
 
     h1 {
-      font-size: 2.5em;
-      margin-top: 40px;
-      font-weight: bold;
-      animation: bounce 1s ease-in-out;
+      color: white;
+      font-size: 2.8em;
+      margin: 1em 0 0.5em;
+      text-shadow: 2px 2px 8px #00000066;
     }
 
-    @keyframes bounce {
-      0% { transform: translateY(-50px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
-    .grid {
+    #card {
       display: grid;
       grid-template-columns: repeat(3, 100px);
-      grid-gap: 15px;
+      gap: 10px;
       justify-content: center;
-      margin-top: 30px;
+      margin: 30px auto;
     }
 
     .cell {
-      width: 100px;
-      height: 100px;
-      background-color: white;
-      color: #52057e;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2em;
-      font-weight: bold;
+      background-color: #f0f0f088;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      padding: 25px 0;
+      font-size: 1.8em;
       cursor: pointer;
+      box-shadow: 0 0 10px #00000066;
       transition: all 0.3s ease;
-      user-select: none;
+      position: relative;
     }
 
     .cell.marked {
-      background-color: #a020f0;
+      background-color: #5f1ab0;
       color: white;
-      animation: glow 1s infinite alternate;
+      font-weight: bold;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #aa00ff;
     }
 
-    @keyframes glow {
-      0% { box-shadow: 0 0 10px #a020f0; }
-      100% { box-shadow: 0 0 25px #f0a0f0; }
-    }
-
-    #sendButton {
-      margin-top: 30px;
-      padding: 15px 25px;
-      font-size: 1.2em;
-      border: none;
-      border-radius: 8px;
-      background-color: #0088cc;
-      color: white;
-      cursor: pointer;
+    #whatsappBtn {
       display: none;
-      animation: pulse 1s infinite alternate;
-    }
-
-    @keyframes pulse {
-      from { box-shadow: 0 0 0px #00aaff; }
-      to { box-shadow: 0 0 15px #00ffff; }
+      margin-top: 20px;
+      font-size: 1.1em;
+      padding: 10px 20px;
+      background-color: #25D366;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
     }
 
     .confetti {
       position: absolute;
-      width: 30px;
-      height: 30px;
-      background-size: cover;
+      font-size: 30px;
+      animation: fall 3s linear;
       pointer-events: none;
-      animation: fall 3s linear infinite;
     }
 
     @keyframes fall {
       0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(800px) rotate(360deg); opacity: 0; }
+      100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <h1>Lotería Panam 🌴</h1>
-  <div class="grid" id="grid"></div>
-  <button id="sendButton">📲 Enviar por WhatsApp</button>
+  <h1>Lotería Panam</h1>
+  <div id="card"></div>
+  <button id="whatsappBtn">Enviar por WhatsApp</button>
 
   <script>
-    const grid = document.getElementById("grid");
-    const sendButton = document.getElementById("sendButton");
+    const totalCells = 9;
+    const maxNumber = 20;
+    const card = document.getElementById("card");
+    const whatsappBtn = document.getElementById("whatsappBtn");
     const selected = new Set();
-    const maxNumbers = 9;
-    const winningNumbers = Array.from({length: 9}, () => Math.floor(Math.random() * 20) + 1);
+    const tropicalIcons = ["🌴", "🍍", "🦜", "🌺", "🍉", "🐠", "🏝️", "🐚", "☀️"];
 
-    winningNumbers.forEach((num, i) => {
+    const numbers = new Set();
+    while (numbers.size < totalCells) {
+      numbers.add(Math.floor(Math.random() * maxNumber) + 1);
+    }
+
+    const numArray = [...numbers];
+
+    numArray.forEach(num => {
       const cell = document.createElement("div");
       cell.className = "cell";
       cell.textContent = num;
@@ -117,39 +103,32 @@
         if (!cell.classList.contains("marked")) {
           cell.classList.add("marked");
           selected.add(num);
-        } else {
-          cell.classList.remove("marked");
-          selected.delete(num);
-        }
 
-        if (selected.size === maxNumbers) {
-          launchConfetti();
-          sendButton.style.display = "inline-block";
-        } else {
-          sendButton.style.display = "none";
+          if (selected.size === totalCells) {
+            launchConfetti();
+            whatsappBtn.style.display = "inline-block";
+          }
         }
       });
-      grid.appendChild(cell);
+      card.appendChild(cell);
     });
 
-    sendButton.addEventListener("click", () => {
-      const msg = `¡Estos son mis números de Lotería Panam! 🎉
-
-${[...selected].join(", ")}`;
-      const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    whatsappBtn.addEventListener("click", () => {
+      const text = "¡He completado mi cartón! Mis números son: " + numArray.join(", ");
+      const url = "https://wa.me/?text=" + encodeURIComponent(text);
       window.open(url, "_blank");
     });
 
     function launchConfetti() {
-      for (let i = 0; i < 30; i++) {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-        const icons = ["🌴", "🌺", "🍹", "☀️"];
-        confetti.textContent = icons[Math.floor(Math.random() * icons.length)];
-        confetti.style.left = Math.random() * window.innerWidth + "px";
-        confetti.style.fontSize = (Math.random() * 20 + 16) + "px";
-        document.body.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 3000);
+      for (let i = 0; i < 50; i++) {
+        const icon = document.createElement("div");
+        icon.className = "confetti";
+        icon.textContent = tropicalIcons[Math.floor(Math.random() * tropicalIcons.length)];
+        icon.style.left = Math.random() * window.innerWidth + "px";
+        icon.style.top = "-40px";
+        icon.style.fontSize = (Math.random() * 24 + 20) + "px";
+        document.body.appendChild(icon);
+        setTimeout(() => icon.remove(), 3000);
       }
     }
   </script>

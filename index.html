@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lotería Panam</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-image: url('fondo.png');
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      color: white;
+    }
+
+    h1 {
+      color: white;
+      font-size: 2.8em;
+      margin: 1em 0 0.5em;
+      text-shadow: 2px 2px 8px #00000066;
+    }
+
+    #card {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin: 30px auto;
+    }
+
+    .cell {
+      background-color: #f0f0f088;
+      border-radius: 12px;
+      padding: 25px 0;
+      font-size: 1.8em;
+      cursor: pointer;
+      box-shadow: 0 0 10px #00000066;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .cell.marked {
+      background-color: #5f1ab0;
+      color: white;
+      font-weight: bold;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #aa00ff;
+    }
+
+    #whatsappBtn {
+      display: none;
+      margin-top: 20px;
+      font-size: 1.1em;
+      padding: 10px 20px;
+      background-color: #25D366;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .confetti {
+      position: absolute;
+      font-size: 30px;
+      animation: fall 3s linear;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Lotería Panam</h1>
+  <div id="card"></div>
+  <button id="whatsappBtn">Enviar por WhatsApp</button>
+
+  <script>
+    const totalCells = 9;
+    const maxNumber = 20;
+    const card = document.getElementById("card");
+    const whatsappBtn = document.getElementById("whatsappBtn");
+    const selected = new Set();
+    const tropicalIcons = ["🌴", "🍍", "🦜", "🌺", "🍉", "🐠", "🏝️", "🐚", "☀️"];
+
+    const numbers = new Set();
+    while (numbers.size < totalCells) {
+      numbers.add(Math.floor(Math.random() * maxNumber) + 1);
+    }
+
+    const numArray = [...numbers];
+
+    numArray.forEach(num => {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.textContent = num;
+      cell.addEventListener("click", () => {
+        if (!cell.classList.contains("marked")) {
+          cell.classList.add("marked");
+          selected.add(num);
+
+          if (selected.size === totalCells) {
+            launchConfetti();
+            whatsappBtn.style.display = "inline-block";
+          }
+        }
+      });
+      card.appendChild(cell);
+    });
+
+    whatsappBtn.addEventListener("click", () => {
+      const text = "¡He completado mi cartón! Mis números son: " + numArray.join(", ");
+      const url = "https://wa.me/?text=" + encodeURIComponent(text);
+      window.open(url, "_blank");
+    });
+
+    function launchConfetti() {
+      for (let i = 0; i < 50; i++) {
+        const icon = document.createElement("div");
+        icon.className = "confetti";
+        icon.textContent = tropicalIcons[Math.floor(Math.random() * tropicalIcons.length)];
+        icon.style.left = Math.random() * window.innerWidth + "px";
+        icon.style.top = "-40px";
+        icon.style.fontSize = (Math.random() * 24 + 20) + "px";
+        document.body.appendChild(icon);
+        setTimeout(() => icon.remove(), 3000);
+      }
+    }
+  </script>
+</body>
+</html>

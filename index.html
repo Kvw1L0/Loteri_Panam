@@ -9,13 +9,14 @@
     body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background-image: url('fondo.png');
-  background-size: contain;   /* muestra la imagen completa */
-  background-repeat: no-repeat;
-  background-position: top center;
+  background: url('fondo.png') no-repeat top center;
+  background-size: 100% auto;   /* ocupa todo el ancho, respeta proporción */
+  background-color: #fff;       /* color de fondo detrás si sobra espacio */
   text-align: center;
   color: white;
+  min-height: 100vh;            /* asegura cubrir la pantalla completa */
 }
+
 
 
     h1 {
